@@ -1,0 +1,13 @@
+# Data is downloaded, never committed
+data/raw/
+*.tgz
+*.csv
+*.parquet
+*.h5
+
+.venv/
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+.pytest_cache/
+.DS_Store
