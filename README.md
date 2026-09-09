@@ -96,6 +96,15 @@ pip install -r requirements-dev.txt
 pytest
 ```
 
+### Docker
+
+```bash
+docker build -t 4top-classifier .
+docker run -p 8888:8888 -v "$(pwd)/data/raw:/app/data/raw" 4top-classifier
+```
+
+Open the URL printed in the logs (includes an access token). Run the tests instead with `docker run 4top-classifier pytest`.
+
 ## Repository layout
 
 ```
