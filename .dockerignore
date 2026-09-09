@@ -1,0 +1,16 @@
+.git
+.github
+.venv
+__pycache__
+*.py[cod]
+.pytest_cache
+.ipynb_checkpoints
+.DS_Store
+data/raw
+*.tgz
+*.csv
+*.parquet
+*.h5
+Dockerfile
+.dockerignore
+README.md
