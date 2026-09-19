@@ -110,11 +110,39 @@ Open the URL printed in the logs (includes an access token). Run the tests inste
 ```
 src/parse.py       variable-length event format -> Event records
 src/features.py    Event records -> 70-column physics feature matrix
-tests/             unit tests for parse.py and features.py
+src/train.py       trains + saves models/model.joblib and metadata.json
+src/serve.py       FastAPI app serving the trained model
+tests/             unit tests for parse.py, features.py, and serve.py
 notebooks/         the analysis
+models/            trained model artifact + metadata (committed, ~2.5 MB)
+infra/             Bicep template + one-time Azure setup script
 data/README.md     how to obtain the dataset
 data/raw/          the downloaded dataset (not committed, see .gitignore)
 ```
+
+## Deployment & MLOps
+
+The classifier is also deployed as a small HTTP service, with CI/CD to Azure. This section covers what exists and, more importantly, *why* -- the design choices a from-scratch MLOps setup for a single-model portfolio project actually calls for, versus what it doesn't.
+
+**Pipeline:** `src/train.py` reproduces the notebook's final pipeline end-to-end (same RNG, same 70/15/15 split, same `RandomizedSearchCV` search space, same Asimov-significance threshold selection) and writes `models/model.joblib` + `models/metadata.json` (feature order, threshold, test metrics, and per-feature training statistics). `src/serve.py` is a FastAPI app that loads that artifact and exposes:
+
+| Endpoint | Purpose |
+|---|---|
+| `GET /health` | liveness + whether the model loaded |
+| `GET /model-info` | metadata: features, threshold, training metrics |
+| `POST /predict` | score one event (raw objects + MET in, signal/background label out) |
+
+`/predict` accepts the same raw per-object event representation `src/parse.py` works with, and calls the *same* `event_features()` function `train.py` used to build its training matrix -- there is exactly one place feature engineering happens, so training and serving cannot silently drift apart.
+
+**CI/CD:** `.github/workflows/tests.yml` (existing) runs `pytest` on every push/PR. `.github/workflows/deploy.yml` builds `Dockerfile.serve` and rolls it out to an Azure Container App whenever the serving code or the committed model artifact changes on `main`, authenticating via OpenID Connect federated credentials -- no Azure client secret is stored in GitHub at all. `infra/main.bicep` (validated with `bicep build`, not yet applied to a live subscription) provisions Log Analytics, Application Insights, an Azure Container Registry, and a Container Apps environment/app; `infra/setup.sh` is the one-time bootstrap that creates the resource group, deploys the Bicep template, and registers the federated credential.
+
+**Design decisions, and why:**
+
+- *Tuned model, not a fixed baseline.* `train.py` replicates the notebook's `RandomizedSearchCV` rather than shipping a simpler fixed-hyperparameter model, so the deployed model's numbers match this README's. Its CLI defaults to the notebook's own budget (30 draws, 3-fold CV); the model currently committed was trained with a reduced budget (15 draws, 3-fold CV) to fit the compute available at deploy time -- see `models/metadata.json`'s `search` field for exactly what produced the committed artifact, and rerun with the defaults for the full search on a machine with more headroom.
+- *A committed artifact, not a model registry.* `model.joblib` is ~2.5 MB, so it's committed directly to git rather than pushed to a registry (MLflow, Azure ML's model registry, etc.). A registry earns its complexity with multiple models, rollback-by-reference, or a team sharing artifacts; a single-model portfolio project doesn't have that problem yet, and git history already gives every past version and a trivial rollback (`git revert`).
+- *Manual retraining, not a scheduled job.* The training data is a static, fixed simulation snapshot, not a live stream -- there's nothing for a nightly retrain to pick up. Retraining is a deliberate act: rerun `train.py`, review the metrics, commit the new artifact. That commit is what triggers `deploy.yml`.
+- *Container Apps consumption plan, not a managed online endpoint.* Azure ML's managed online endpoints bill hourly for a provisioned VM whether or not it's serving traffic. Container Apps on the consumption plan scales to zero between requests and only costs money while actually handling one -- the right tradeoff for a project funded by a fixed student credit rather than a production SLA.
+- *A per-request drift tripwire, not a population drift monitor.* `/predict` compares each incoming feature to its training-set mean/std and logs a warning (visible in Application Insights) when a feature lands more than a few standard deviations out. That's a real limitation, not a full solution: genuine drift detection needs a *distribution* of requests over time, not one at a time -- this just catches individual wildly-out-of-range inputs and gives a hook to build a real one on top of.
 
 ## Caveats
 

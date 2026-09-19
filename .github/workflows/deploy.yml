@@ -1,0 +1,90 @@
+name: deploy
+
+# Builds Dockerfile.serve and rolls it out to the Azure Container App
+# running src/serve.py, whenever the serving code, the trained model
+# artifact, or the serving image definition changes on main. Also
+# runnable by hand from the Actions tab (workflow_dispatch) for the
+# first manual deploy, or to redeploy without a code change.
+#
+# Auth is OIDC (azure/login@v2 with a federated credential) -- no Azure
+# client secret is stored in GitHub at all. See infra/setup.sh for the
+# one-time setup that registers the federated credential and the repo
+# variables this workflow reads (vars.*, not secrets.*, since none of
+# these identifiers are themselves sensitive).
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/serve.py"
+      - "src/parse.py"
+      - "src/features.py"
+      - "src/__init__.py"
+      - "models/**"
+      - "Dockerfile.serve"
+      - "requirements-serve.txt"
+      - ".github/workflows/deploy.yml"
+  workflow_dispatch: {}
+
+permissions:
+  id-token: write   # required for OIDC federated login to Azure
+  contents: read
+
+concurrency:
+  group: deploy-fourtop-serve
+  cancel-in-progress: false
+
+env:
+  IMAGE_NAME: fourtop-serve
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Log in to Azure (OIDC, no stored secret)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Log in to Azure Container Registry
+        run: az acr login --name "${{ vars.ACR_NAME }}"
+
+      - name: Build and push serving image
+        id: build
+        run: |
+          set -euo pipefail
+          IMAGE="${{ vars.ACR_NAME }}.azurecr.io/${IMAGE_NAME}:${{ github.sha }}"
+          LATEST="${{ vars.ACR_NAME }}.azurecr.io/${IMAGE_NAME}:latest"
+          docker build -f Dockerfile.serve -t "$IMAGE" -t "$LATEST" .
+          docker push "$IMAGE"
+          docker push "$LATEST"
+          echo "image=$IMAGE" >> "$GITHUB_OUTPUT"
+
+      - name: Roll out new image to the Container App
+        run: |
+          az containerapp update \
+            --name "${{ vars.CONTAINER_APP_NAME }}" \
+            --resource-group "${{ vars.AZURE_RESOURCE_GROUP }}" \
+            --image "${{ steps.build.outputs.image }}"
+
+      - name: Smoke-test the deployed revision
+        run: |
+          set -euo pipefail
+          FQDN=$(az containerapp show \
+            --name "${{ vars.CONTAINER_APP_NAME }}" \
+            --resource-group "${{ vars.AZURE_RESOURCE_GROUP }}" \
+            --query properties.configuration.ingress.fqdn -o tsv)
+          for i in $(seq 1 10); do
+            if curl -sf "https://${FQDN}/health"; then
+              echo "Deployed revision is healthy at https://${FQDN}"
+              exit 0
+            fi
+            echo "waiting for the new revision to become healthy (attempt $i/10)..."
+            sleep 15
+          done
+          echo "New revision never became healthy" >&2
+          exit 1

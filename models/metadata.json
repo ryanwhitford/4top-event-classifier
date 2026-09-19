@@ -1,0 +1,475 @@
+{
+  "model_type": "HistGradientBoostingClassifier",
+  "sklearn_version": "1.8.0",
+  "python_version": "3.11.15",
+  "trained_at": "2026-09-18T03:46:46.865453+00:00",
+  "random_state": 42,
+  "features": [
+    "met",
+    "met_phi",
+    "n_jets_all",
+    "n_jets_light",
+    "n_bjets",
+    "n_leptons",
+    "n_photons",
+    "n_objects",
+    "b_fraction",
+    "ht",
+    "ht_b",
+    "ht_b_frac",
+    "lepton_pt_sum",
+    "st",
+    "m_eff",
+    "total_E",
+    "m_all",
+    "centrality",
+    "lepton_charge_sum",
+    "abs_lepton_charge_sum",
+    "has_same_sign_pair",
+    "jet1_pt",
+    "jet1_eta",
+    "jet1_E",
+    "jet1_mass",
+    "jet2_pt",
+    "jet2_eta",
+    "jet2_E",
+    "jet2_mass",
+    "jet3_pt",
+    "jet3_eta",
+    "jet3_E",
+    "jet3_mass",
+    "jet4_pt",
+    "jet4_eta",
+    "jet4_E",
+    "jet4_mass",
+    "bjet1_pt",
+    "bjet1_eta",
+    "bjet1_E",
+    "bjet1_mass",
+    "bjet2_pt",
+    "bjet2_eta",
+    "bjet2_E",
+    "bjet2_mass",
+    "bjet3_pt",
+    "bjet3_eta",
+    "bjet3_E",
+    "bjet3_mass",
+    "lep1_pt",
+    "lep1_eta",
+    "lep1_E",
+    "lep1_mass",
+    "lep2_pt",
+    "lep2_eta",
+    "lep2_E",
+    "lep2_mass",
+    "m_bb",
+    "dr_bb",
+    "m_jj",
+    "min_dr_jj",
+    "mean_dr_jj",
+    "max_dr_jj",
+    "mt_lep1_met",
+    "dphi_lep1_met",
+    "dphi_jet1_met",
+    "sphericity",
+    "aplanarity",
+    "jet_eta_std",
+    "jet_eta_span"
+  ],
+  "n_features": 70,
+  "threshold": 0.826989966555184,
+  "threshold_significance_val": 29.46556675157577,
+  "lumi": 247.79131364126255,
+  "signal_processes": [
+    "4top"
+  ],
+  "process_counts": {
+    "4top": 152000,
+    "ttbarW": 38000,
+    "ttbarWW": 38000,
+    "ttbarZ": 38000,
+    "ttbarHiggs": 36072
+  },
+  "best_params": {
+    "l2_regularization": 0.001158417231054399,
+    "learning_rate": 0.03737508643922314,
+    "max_iter": 291,
+    "max_leaf_nodes": 74,
+    "min_samples_leaf": 181
+  },
+  "cv_best_average_precision": 0.8394919603702516,
+  "search": {
+    "n_iter": 15,
+    "cv": 3
+  },
+  "dataset": {
+    "n_events_total": 302072,
+    "n_train": 211450,
+    "n_val": 45311,
+    "n_test": 45311,
+    "signal_fraction_total": 0.5031912921422708
+  },
+  "test_metrics": {
+    "roc_auc": 0.8356778440481729,
+    "pr_auc": 0.8423274431431896,
+    "brier_score": 0.16502845062390636,
+    "signal_efficiency": 0.4259849289742752,
+    "background_rejection": 0.9611779436066267,
+    "significance_no_selection": 15.915061722427412,
+    "significance_at_threshold": 29.59949477036789,
+    "n_test_events": 45311,
+    "test_signal_fraction": 0.5031890710864911
+  },
+  "feature_stats": {
+    "met": {
+      "mean": 229.1272893665973,
+      "std": 155.0721973474032,
+      "nan_rate": 0.0
+    },
+    "met_phi": {
+      "mean": -0.002996771179812581,
+      "std": 1.8133756427637853,
+      "nan_rate": 0.0
+    },
+    "n_jets_all": {
+      "mean": 7.387855284937338,
+      "std": 1.3093353308512552,
+      "nan_rate": 0.0
+    },
+    "n_jets_light": {
+      "mean": 5.022837550248286,
+      "std": 1.1595383933879058,
+      "nan_rate": 0.0
+    },
+    "n_bjets": {
+      "mean": 2.3650177346890517,
+      "std": 0.626444270952038,
+      "nan_rate": 0.0
+    },
+    "n_leptons": {
+      "mean": 2.2110617167179,
+      "std": 0.4080620889693052,
+      "nan_rate": 0.0
+    },
+    "n_photons": {
+      "mean": 0.03720501300543864,
+      "std": 0.19275489262116804,
+      "nan_rate": 0.0
+    },
+    "n_objects": {
+      "mean": 9.636122014660677,
+      "std": 1.3111856660296857,
+      "nan_rate": 0.0
+    },
+    "b_fraction": {
+      "mean": 0.3226567872237061,
+      "std": 0.06811923735472646,
+      "nan_rate": 0.0
+    },
+    "ht": {
+      "mean": 1091.2968656680066,
+      "std": 407.8010934666993,
+      "nan_rate": 0.0
+    },
+    "ht_b": {
+      "mean": 314.76337206337195,
+      "std": 198.5258820478049,
+      "nan_rate": 0.0
+    },
+    "ht_b_frac": {
+      "mean": 0.29693929217007586,
+      "std": 0.14881586678460085,
+      "nan_rate": 0.0
+    },
+    "lepton_pt_sum": {
+      "mean": 224.24847942917947,
+      "std": 133.8386307835148,
+      "nan_rate": 0.0
+    },
+    "st": {
+      "mean": 1544.6726344637832,
+      "std": 513.1328360838896,
+      "nan_rate": 0.0
+    },
+    "m_eff": {
+      "mean": 1320.424155034604,
+      "std": 474.1541106617453,
+      "nan_rate": 0.0
+    },
+    "total_E": {
+      "mean": 2344.8454256467253,
+      "std": 824.3981786083017,
+      "nan_rate": 0.0
+    },
+    "m_all": {
+      "mean": 2109.0409297934502,
+      "std": 778.2539013490107,
+      "nan_rate": 0.0
+    },
+    "centrality": {
+      "mean": 0.5806039566225688,
+      "std": 0.12623739930857733,
+      "nan_rate": 0.0
+    },
+    "lepton_charge_sum": {
+      "mean": 0.058089382832820995,
+      "std": 1.8343397988288805,
+      "nan_rate": 0.0
+    },
+    "abs_lepton_charge_sum": {
+      "mean": 1.789278789311894,
+      "std": 0.40823802870879033,
+      "nan_rate": 0.0
+    },
+    "has_same_sign_pair": {
+      "mean": 1.0,
+      "std": 0.0,
+      "nan_rate": 0.0
+    },
+    "jet1_pt": {
+      "mean": 423.55686677890753,
+      "std": 199.6166277420618,
+      "nan_rate": 0.0
+    },
+    "jet1_eta": {
+      "mean": -0.0001719537745736575,
+      "std": 1.1197702152868612,
+      "nan_rate": 0.0
+    },
+    "jet1_E": {
+      "mean": 734.6299725646726,
+      "std": 471.35848739543235,
+      "nan_rate": 0.0
+    },
+    "jet1_mass": {
+      "mean": 61.736243481077125,
+      "std": 41.75785300755802,
+      "nan_rate": 0.0
+    },
+    "jet2_pt": {
+      "mean": 239.4928044677229,
+      "std": 130.76803494309897,
+      "nan_rate": 0.0
+    },
+    "jet2_eta": {
+      "mean": 0.0001029264449303527,
+      "std": 1.1015103120295855,
+      "nan_rate": 0.0
+    },
+    "jet2_E": {
+      "mean": 412.2758923433437,
+      "std": 302.72260260765046,
+      "nan_rate": 0.0
+    },
+    "jet2_mass": {
+      "mean": 40.844575192758455,
+      "std": 31.23231404654658,
+      "nan_rate": 0.0
+    },
+    "jet3_pt": {
+      "mean": 146.1428259754079,
+      "std": 71.47094576510072,
+      "nan_rate": 0.0
+    },
+    "jet3_eta": {
+      "mean": 0.0017984430579998105,
+      "std": 1.1518379735533566,
+      "nan_rate": 0.0
+    },
+    "jet3_E": {
+      "mean": 265.7356421399858,
+      "std": 196.54623836956625,
+      "nan_rate": 0.0
+    },
+    "jet3_mass": {
+      "mean": 23.968839356023683,
+      "std": 16.876687657090596,
+      "nan_rate": 0.0
+    },
+    "jet4_pt": {
+      "mean": 100.43441164246866,
+      "std": 45.45831875732451,
+      "nan_rate": 0.0
+    },
+    "jet4_eta": {
+      "mean": -0.0037411082794651233,
+      "std": 1.1938968785151534,
+      "nan_rate": 0.0
+    },
+    "jet4_E": {
+      "mean": 190.11285734499882,
+      "std": 138.93629207154865,
+      "nan_rate": 0.0
+    },
+    "jet4_mass": {
+      "mean": 16.46906234735011,
+      "std": 10.275477040710399,
+      "nan_rate": 0.0
+    },
+    "bjet1_pt": {
+      "mean": 202.6411017488768,
+      "std": 143.3560763814791,
+      "nan_rate": 0.0
+    },
+    "bjet1_eta": {
+      "mean": -0.0007942333929882093,
+      "std": 1.0341477364779184,
+      "nan_rate": 0.0
+    },
+    "bjet1_E": {
+      "mean": 323.5891758987941,
+      "std": 263.19604283125767,
+      "nan_rate": 0.0
+    },
+    "bjet1_mass": {
+      "mean": 35.78299232657721,
+      "std": 34.21792864045404,
+      "nan_rate": 0.0
+    },
+    "bjet2_pt": {
+      "mean": 89.37938606431783,
+      "std": 60.07711579083318,
+      "nan_rate": 0.0
+    },
+    "bjet2_eta": {
+      "mean": -0.0009898429830197206,
+      "std": 1.1381109021781042,
+      "nan_rate": 0.0
+    },
+    "bjet2_E": {
+      "mean": 157.34817061527548,
+      "std": 129.9732982411842,
+      "nan_rate": 0.0
+    },
+    "bjet2_mass": {
+      "mean": 14.933574129984926,
+      "std": 12.736251341319944,
+      "nan_rate": 0.0
+    },
+    "bjet3_pt": {
+      "mean": 64.95899254304572,
+      "std": 36.13719550824136,
+      "nan_rate": 0.7069330811066445
+    },
+    "bjet3_eta": {
+      "mean": -0.004779720828028529,
+      "std": 1.1808439790197085,
+      "nan_rate": 0.7069330811066445
+    },
+    "bjet3_E": {
+      "mean": 120.95460273362488,
+      "std": 95.20236862963861,
+      "nan_rate": 0.7069330811066445
+    },
+    "bjet3_mass": {
+      "mean": 11.150410469996551,
+      "std": 7.389730440987077,
+      "nan_rate": 0.7069330811066445
+    },
+    "lep1_pt": {
+      "mean": 144.4976912466304,
+      "std": 99.24973294817839,
+      "nan_rate": 0.0
+    },
+    "lep1_eta": {
+      "mean": -0.003665083822090327,
+      "std": 1.019294074787057,
+      "nan_rate": 0.0
+    },
+    "lep1_E": {
+      "mean": 226.55445303570585,
+      "std": 179.98399271657993,
+      "nan_rate": 0.0
+    },
+    "lep1_mass": {
+      "mean": 0.22049211183418704,
+      "std": 0.36834832557892416,
+      "nan_rate": 0.0
+    },
+    "lep2_pt": {
+      "mean": 68.5596659981083,
+      "std": 41.29497956103925,
+      "nan_rate": 0.0
+    },
+    "lep2_eta": {
+      "mean": -0.0018897507278381174,
+      "std": 1.100249323288469,
+      "nan_rate": 0.0
+    },
+    "lep2_E": {
+      "mean": 117.63487353416883,
+      "std": 93.86402336821025,
+      "nan_rate": 0.0
+    },
+    "lep2_mass": {
+      "mean": 0.1335066518663906,
+      "std": 0.2054523116650402,
+      "nan_rate": 0.0
+    },
+    "m_bb": {
+      "mean": 280.85450672345337,
+      "std": 211.87201803297856,
+      "nan_rate": 0.0
+    },
+    "dr_bb": {
+      "mean": 2.2533433421690896,
+      "std": 0.8587514949980278,
+      "nan_rate": 0.0
+    },
+    "m_jj": {
+      "mean": 641.8247427275726,
+      "std": 467.4602193557635,
+      "nan_rate": 0.0
+    },
+    "min_dr_jj": {
+      "mean": 0.8040854830507739,
+      "std": 0.16023376002429351,
+      "nan_rate": 0.0
+    },
+    "mean_dr_jj": {
+      "mean": 2.3447649042973855,
+      "std": 0.25069974724987004,
+      "nan_rate": 0.0
+    },
+    "max_dr_jj": {
+      "mean": 4.0156827860974476,
+      "std": 0.5709162148277697,
+      "nan_rate": 0.0
+    },
+    "mt_lep1_met": {
+      "mean": 119.37266253167883,
+      "std": 111.41443836429998,
+      "nan_rate": 0.0
+    },
+    "dphi_lep1_met": {
+      "mean": 0.9457973893010961,
+      "std": 0.8485805833674075,
+      "nan_rate": 0.0
+    },
+    "dphi_jet1_met": {
+      "mean": 2.332141599100824,
+      "std": 0.7567636270860078,
+      "nan_rate": 0.0
+    },
+    "sphericity": {
+      "mean": 0.3076029716515475,
+      "std": 0.1855625233580014,
+      "nan_rate": 0.0
+    },
+    "aplanarity": {
+      "mean": 0.0631191212548768,
+      "std": 0.053512392911764524,
+      "nan_rate": 0.0
+    },
+    "jet_eta_std": {
+      "mean": 1.0666238299268325,
+      "std": 0.26488665114605103,
+      "nan_rate": 0.0
+    },
+    "jet_eta_span": {
+      "mean": 3.2079608285776473,
+      "std": 0.7914855374266319,
+      "nan_rate": 0.0
+    }
+  }
+}

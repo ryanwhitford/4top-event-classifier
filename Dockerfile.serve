@@ -1,0 +1,39 @@
+# Serving image for the Four-Top Event Classifier's FastAPI app (src/serve.py).
+#
+# Separate from the top-level Dockerfile, which builds a Jupyter environment
+# for the exploratory notebook. This image is deliberately lean: no
+# matplotlib/jupyterlab/shap, no notebook, no raw data (~100 MB, never
+# committed) -- just the trained model artifact and the code that serves it.
+#
+# Build:
+#   docker build -f Dockerfile.serve -t fourtop-serve .
+# Run:
+#   docker run -p 8000:8000 fourtop-serve
+#   curl localhost:8000/health
+
+FROM python:3.11-slim AS base
+
+WORKDIR /app
+
+# --- dependencies (own layer, cached unless requirements-serve.txt changes) --
+COPY requirements-serve.txt ./
+RUN pip install --no-cache-dir -r requirements-serve.txt
+
+# --- application code + trained model artifact ------------------------------
+# Only what serve.py actually imports/needs at runtime -- not tests/,
+# notebooks/, or the raw dataset.
+COPY src/__init__.py src/parse.py src/features.py src/serve.py ./src/
+COPY models/model.joblib models/metadata.json ./models/
+
+RUN useradd --create-home appuser && chown -R appuser:appuser /app
+USER appuser
+
+ENV MODEL_DIR=/app/models \
+    PYTHONUNBUFFERED=1
+
+EXPOSE 8000
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/health').read()" || exit 1
+
+CMD ["uvicorn", "src.serve:app", "--host", "0.0.0.0", "--port", "8000"]

@@ -1,0 +1,19 @@
+# Runtime dependencies for the FastAPI serving app (src/serve.py) only.
+# Deliberately excludes matplotlib, jupyterlab, and shap -- those belong to
+# the notebook environment (see requirements.txt / Dockerfile), not the
+# serving image, which should stay as small as reasonably possible.
+#
+# scikit-learn is pinned to the exact version models/model.joblib was
+# trained with (see models/metadata.json -> sklearn_version) to avoid
+# sklearn's InconsistentVersionWarning and the small but real risk of a
+# pickle behaving differently across minor versions. Bump this only when
+# you retrain and commit a new model.
+numpy>=1.24
+pandas>=2.0
+scipy>=1.10
+scikit-learn==1.8.0
+joblib>=1.3
+fastapi>=0.110
+uvicorn[standard]>=0.29
+azure-monitor-opentelemetry>=1.6
+opentelemetry-instrumentation-fastapi>=0.48b0
