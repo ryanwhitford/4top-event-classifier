@@ -17,4 +17,24 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - run: pip install -r requirements-dev.txt
-      - run: pytest -q
+      - run: pytest -q --ignore=tests/test_serve.py
+
+  serve-tests:
+    # Runs tests/test_serve.py against the same scikit-learn version and
+    # Python minor version the serving image (Dockerfile.serve) actually
+    # uses, since models/model.joblib was pickled with that exact sklearn
+    # version. The `pytest` job above intentionally skips this file --
+    # its unpinned scikit-learn>=1.3 (from requirements.txt, kept loose so
+    # the 3.10 leg still works) resolves to whatever is newest on each
+    # matrix leg, which doesn't match the pinned model and made these
+    # tests fail with 503s (the model failing to unpickle) even though
+    # the actual deployed service, pinned to scikit-learn==1.8.0 in
+    # requirements-serve.txt, was never at risk.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -r requirements-serve.txt -r requirements-dev.txt
+      - run: pytest -q tests/test_serve.py
