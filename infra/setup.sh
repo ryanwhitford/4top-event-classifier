@@ -49,6 +49,16 @@ echo "ACR:           $ACR_NAME"
 echo "Container App: $CONTAINER_APP_NAME"
 echo "URL (placeholder image for now): https://$CONTAINER_APP_FQDN"
 
+# NOTE: main.bicep creates the Container App on a public placeholder image,
+# because on a first run there is no image in ACR yet. Azure does not persist a
+# registry entry for a registry the current image does not come from, so the
+# app is left with no registry binding until the first real deploy. The first
+# run of .github/workflows/deploy.yml therefore CREATES the app properly --
+# private image and registry identity in one request -- rather than updating
+# it. Do not try to bind the registry here with `az containerapp registry set
+# --identity`: that CLI path silently does nothing when the identity is already
+# assigned to the app, and leaves registries unset.
+
 echo "== Setting up GitHub Actions OIDC login (no client secret) =="
 APP_NAME="github-oidc-$NAME_PREFIX"
 EXISTING_APP_ID=$(az ad app list --display-name "$APP_NAME" --query "[0].appId" -o tsv 2>/dev/null || true)

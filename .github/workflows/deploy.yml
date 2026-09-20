@@ -64,12 +64,43 @@ jobs:
           docker push "$LATEST"
           echo "image=$IMAGE" >> "$GITHUB_OUTPUT"
 
-      - name: Roll out new image to the Container App
+      # A Container App must be CREATED with its private image and its
+      # registry identity in the same request. Creating it on a public
+      # placeholder (as main.bicep does) and updating it to an ACR image
+      # afterwards does not work: Azure does not persist a registry entry for
+      # a registry the current image does not come from, so the update fails
+      # to pull, and repeated failed provisions leave the resource in a state
+      # no further update can recover -- it has to be deleted and recreated.
+      # So: update when the app already exists, create properly when it does
+      # not. See the deployment notes in README.md.
+      - name: Create or update the Container App
         run: |
-          az containerapp update \
-            --name "${{ vars.CONTAINER_APP_NAME }}" \
-            --resource-group "${{ vars.AZURE_RESOURCE_GROUP }}" \
-            --image "${{ steps.build.outputs.image }}"
+          set -euo pipefail
+          APP="${{ vars.CONTAINER_APP_NAME }}"
+          RG="${{ vars.AZURE_RESOURCE_GROUP }}"
+          IMAGE="${{ steps.build.outputs.image }}"
+
+          if az containerapp show --name "$APP" --resource-group "$RG" -o none 2>/dev/null; then
+            echo "Container App exists -- updating image."
+            az containerapp update --name "$APP" --resource-group "$RG" --image "$IMAGE"
+          else
+            echo "Container App does not exist -- creating it with the private image and its identity."
+            IDENTITY_ID=$(az identity show --name "${APP}-identity" --resource-group "$RG" --query id -o tsv)
+            ENV_ID=$(az containerapp env list --resource-group "$RG" --query "[0].id" -o tsv)
+            az containerapp create \
+              --name "$APP" \
+              --resource-group "$RG" \
+              --environment "$ENV_ID" \
+              --user-assigned "$IDENTITY_ID" \
+              --registry-identity "$IDENTITY_ID" \
+              --registry-server "${{ vars.ACR_NAME }}.azurecr.io" \
+              --image "$IMAGE" \
+              --target-port 8000 \
+              --ingress external \
+              --min-replicas 0 \
+              --max-replicas 2 \
+              --cpu 0.5 --memory 1.0Gi
+          fi
 
       - name: Smoke-test the deployed revision
         run: |
