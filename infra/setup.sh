@@ -87,14 +87,14 @@ az role assignment create \
   --scope "$ACR_ID" \
   -o none 2>/dev/null || echo "(AcrPush role assignment already exists, skipping)"
 
-# Federated credential: trusts GitHub Actions runs on the main branch of this
+# Federated credential: trusts GitHub Actions runs on the master branch of this
 # repo specifically -- not arbitrary GitHub tokens.
 az ad app federated-credential create \
   --id "$AZURE_CLIENT_ID" \
   --parameters "{
     \"name\": \"github-main-branch\",
     \"issuer\": \"https://token.actions.githubusercontent.com\",
-    \"subject\": \"repo:${GITHUB_REPO}:ref:refs/heads/main\",
+    \"subject\": \"repo:${GITHUB_REPO}:ref:refs/heads/master\",
     \"audiences\": [\"api://AzureADTokenExchange\"]
   }" -o none 2>/dev/null || echo "(federated credential already exists, skipping)"
 
@@ -110,6 +110,6 @@ echo "  gh variable set AZURE_RESOURCE_GROUP  --body \"$RESOURCE_GROUP\""
 echo "  gh variable set ACR_NAME              --body \"$ACR_NAME\""
 echo "  gh variable set CONTAINER_APP_NAME    --body \"$CONTAINER_APP_NAME\""
 echo ""
-echo "Then push to main, or run the 'deploy' workflow manually from the"
+echo "Then push to master, or run the 'deploy' workflow manually from the"
 echo "Actions tab, to replace the placeholder image with fourtop-serve."
 echo "================================================================"
